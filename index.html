@@ -1065,6 +1065,7 @@ Yours,
 
       /* ── Music (SoundCloud) ── */
       let ytVisible = false;
+      let scWidget = null;
 
       function startMusic() {
         const trackUrl = (CONFIG.SOUNDCLOUD_URL || "").trim();
@@ -1074,12 +1075,26 @@ Yours,
 
         // Create SoundCloud embed iframe
         const iframe = document.createElement("iframe");
+        iframe.id = "sc-player";
         const encoded = encodeURIComponent(trackUrl);
         iframe.src = `https://w.soundcloud.com/player/?url=${encoded}&color=%23d6336c&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`;
         iframe.allow = "autoplay";
         iframe.scrolling = "no";
         iframe.setAttribute("frameborder", "no");
         el.ytWrapper.appendChild(iframe);
+
+        // Load SC Widget API and force play
+        const script = document.createElement("script");
+        script.src = "https://w.soundcloud.com/player/api.js";
+        script.onload = () => {
+          if (window.SC && window.SC.Widget) {
+            scWidget = window.SC.Widget(iframe);
+            scWidget.bind(window.SC.Widget.Events.READY, () => {
+              scWidget.play();
+            });
+          }
+        };
+        document.head.appendChild(script);
 
         // Show the player briefly then auto-hide
         ytVisible = true;
