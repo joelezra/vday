@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>For You 💌</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #fdf6f0;
+        --card: rgba(255, 255, 255, 0.72);
+        --card-border: rgba(255, 255, 255, 0.6);
+        --text: #1a1a2e;
+        --muted: #6b5e6b;
+        --accent: #d6336c;
+        --accent-light: #f06595;
+        --accent-glow: rgba(214, 51, 108, 0.18);
+        --accent-soft: rgba(214, 51, 108, 0.08);
+        --shadow-sm: 0 2px 8px rgba(26, 26, 46, 0.06);
+        --shadow-md: 0 12px 40px rgba(26, 26, 46, 0.1);
+        --shadow-lg: 0 24px 60px rgba(26, 26, 46, 0.14);
+        --radius: 24px;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body { height: 100%; }
+
+      body {
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #viewport-shell {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* ── Ambient Background ── */
+      .ambient {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+      }
+
+      .ambient .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.5;
+        animation: orbFloat 18s ease-in-out infinite alternate;
+      }
+
+      .orb-1 {
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(240, 101, 149, 0.35), transparent 70%);
+        top: -10%; left: -5%;
+        animation-delay: 0s;
+      }
+
+      .orb-2 {
+        width: 400px; height: 400px;
+        background: radial-gradient(circle, rgba(214, 51, 108, 0.2), transparent 70%);
+        bottom: -15%; right: -10%;
+        animation-delay: -6s;
+      }
+
+      .orb-3 {
+        width: 300px; height: 300px;
+        background: radial-gradient(circle, rgba(255, 200, 180, 0.4), transparent 70%);
+        top: 40%; right: 20%;
+        animation-delay: -12s;
+      }
+
+      @keyframes orbFloat {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(30px, -20px) scale(1.08); }
+        100% { transform: translate(-20px, 15px) scale(0.95); }
+      }
+
+      /* ── Floating Petals ── */
+      .petals {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .petal {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: var(--accent);
+        border-radius: 50% 0 50% 50%;
+        opacity: 0;
+        animation: petalFall linear forwards;
+      }
+
+      @keyframes petalFall {
+        0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8); }
+        8% { opacity: 0.6; }
+        100% { opacity: 0; transform: translate3d(var(--dx), 110vh, 0) rotate(var(--rot)) scale(0.4); }
+      }
+
+      /* ── Layout ── */
+      #app {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 32px 20px;
+      }
+
+      .screen {
+        width: 100%;
+        max-width: 520px;
+        animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .hidden { display: none !important; }
+
+      /* ── Card ── */
+      .card {
+        background: var(--card);
+        backdrop-filter: blur(20px) saturate(1.4);
+        -webkit-backdrop-filter: blur(20px) saturate(1.4);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 40px 36px;
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+        overflow: visible;
+      }
+
+      /* ── Emoji Badge ── */
+      .emoji {
+        font-size: 48px;
+        margin-bottom: 20px;
+        display: inline-block;
+        animation: gentleBounce 2.5s ease-in-out infinite;
+      }
+
+      @keyframes gentleBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+      }
+
+      /* ── Typography ── */
+      h1 {
+        font-family: 'DM Serif Display', serif;
+        font-size: clamp(28px, 5vw, 40px);
+        font-weight: 400;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+
+      /* ── Buttons ── */
+      .yes-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .no-area {
+        position: relative;
+        width: 100%;
+        height: 80px;
+        border-radius: 16px;
+        overflow: visible;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 999px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        letter-spacing: 0.01em;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .btn:focus-visible {
+        outline: 3px solid var(--accent-glow);
+        outline-offset: 3px;
+      }
+
+      .btn-yes {
+        padding: 16px 48px;
+        font-size: 17px;
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 8px 28px rgba(214, 51, 108, 0.3);
+      }
+
+      .btn-yes:hover {
+        background: var(--accent-light);
+        box-shadow: 0 12px 36px rgba(214, 51, 108, 0.35);
+        transform: translateY(-2px);
+      }
+
+      .btn-yes:active { transform: translateY(0) scale(0.98); }
+
+      .btn-no {
+        padding: 12px 32px;
+        font-size: 14px;
+        background: transparent;
+        color: var(--muted);
+        border: 1.5px solid rgba(107, 94, 107, 0.2);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+        will-change: left, top;
+        transition: left 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+                    top 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    font-size 0.3s ease,
+                    padding 0.3s ease,
+                    opacity 0.3s ease;
+      }
+
+      .btn-no.escaped {
+        position: absolute;
+        z-index: 9999;
+      }
+
+      .btn-no:hover {
+        background: rgba(107, 94, 107, 0.06);
+      }
+
+      /* ── Taunt Message ── */
+      .taunt {
+        min-height: 24px;
+        color: var(--muted);
+        font-size: 13px;
+        font-style: italic;
+        margin-top: 8px;
+        transition: opacity 0.3s ease;
+        opacity: 0;
+      }
+
+      .taunt.visible { opacity: 1; }
+
+      /* ── Screen: Yes Response ── */
+      .yes-screen .card {
+        text-align: center;
+      }
+
+      .yes-emoji {
+        font-size: 64px;
+        display: inline-block;
+        animation: celebratePop 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      @keyframes celebratePop {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      .yes-screen h1 { margin-top: 16px; margin-bottom: 12px; }
+
+      .letter-text {
+        position: relative;
+        margin: 24px auto 0;
+        max-width: 420px;
+        text-align: left;
+        padding: 24px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(214, 51, 108, 0.08);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        min-height: 180px;
+      }
+
+      .caret {
+        display: inline-block;
+        width: 2px;
+        height: 18px;
+        background: var(--accent);
+        margin-left: 1px;
+        transform: translateY(3px);
+        animation: caretBlink 1s steps(2) infinite;
+      }
+
+      @keyframes caretBlink {
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+
+      .plan-tag {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 20px;
+        border-radius: 14px;
+        background: var(--accent-soft);
+        border: 1px solid rgba(214, 51, 108, 0.12);
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .actions-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        border: 1.5px solid rgba(107, 94, 107, 0.15);
+        background: rgba(255, 255, 255, 0.6);
+        color: var(--muted);
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .chip:hover {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(107, 94, 107, 0.25);
+        transform: translateY(-1px);
+      }
+
+      .chip:disabled {
+        opacity: 0.5;
+        cursor: default;
+        transform: none;
+      }
+
+      /* ── Yes screen viewport fit ── */
+      .yes-screen .card {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 64px);
+      }
+
+      .letter-text {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        min-height: 80px;
+      }
+
+      /* ── Scattered Polaroids (viewport background) ── */
+      .floating-polaroids {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .floating-polaroid {
+        position: absolute;
+        background: #fff;
+        padding: 17px 17px 72px 17px;
+        box-shadow: 0 6px 30px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+        width: 304px;
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+        opacity: 0;
+      }
+
+      .floating-polaroid.visible { opacity: 1; }
+
+      .floating-polaroid .fp-photo {
+        width: 100%;
+        height: 270px;
+        object-fit: cover;
+        display: block;
+        background: #f0ebe6;
+        transition: opacity 0.6s ease;
+      }
+
+      .floating-polaroid .fp-caption {
+        position: absolute;
+        bottom: 8px;
+        left: 10px;
+        right: 10px;
+        text-align: center;
+        font-family: 'Caveat', cursive;
+        font-size: 18px;
+        color: #555;
+      }
+
+      /* Polaroid positions — desktop */
+      .fp-1 { top: 8%; left: 4%; }
+      .fp-2 { top: 55%; left: 3%; }
+      .fp-3 { top: 10%; right: 4%; left: auto; }
+      .fp-4 { top: 55%; right: 3%; left: auto; }
+
+      /* Slideshow dots */
+      .slideshow-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .slideshow-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(214, 51, 108, 0.2);
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        transition: all 0.3s ease;
+      }
+
+      .slideshow-dot.active {
+        background: var(--accent);
+        transform: scale(1.3);
+      }
+
+      /* ── Music player ── */
+      .music-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+      }
+
+      .yt-wrapper {
+        width: 280px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        pointer-events: none;
+      }
+
+      .yt-wrapper.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+      }
+
+      .yt-wrapper iframe {
+        display: block;
+        width: 100%;
+        height: 158px;
+        border: none;
+      }
+
+      .music-toggle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: white;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 16px rgba(214, 51, 108, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .music-toggle:hover {
+        transform: scale(1.1);
+        background: var(--accent-light);
+      }
+
+      /* ── Tablet ── */
+      @media (max-width: 1024px) {
+        .floating-polaroid { width: 237px; }
+        .floating-polaroid .fp-photo { height: 203px; }
+        .floating-polaroid .fp-caption { font-size: 15px; }
+        .fp-1 { top: 5%; left: 2%; }
+        .fp-2 { top: 60%; left: 1%; }
+        .fp-3 { top: 5%; right: 2%; }
+        .fp-4 { top: 60%; right: 1%; }
+      }
+
+      /* ── Mobile ── */
+      @media (max-width: 560px) {
+        .card { padding: 32px 24px; }
+        .floating-polaroids { display: none; }
+        .letter-text { padding: 18px; font-size: 14px; }
+        .yt-wrapper { width: 240px; }
+        .yt-wrapper iframe { height: 135px; }
+        .music-container { bottom: 12px; right: 12px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .petal { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="viewport-shell">
+
+    <!-- Ambient background orbs -->
+    <div class="ambient" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Floating petals -->
+    <div class="petals" id="petals" aria-hidden="true"></div>
+
+    <main id="app">
+
+      <!-- ── QUESTION SCREEN ── -->
+      <section class="screen" id="screen-question">
+        <div class="card">
+          <div class="emoji" aria-hidden="true">💌</div>
+          <h1>Will you be my Valentine?</h1>
+          <p class="subtitle">I already know the answer… but I want to hear you say it.</p>
+
+          <div class="yes-area">
+            <button class="btn btn-yes" id="yesBtn" type="button">Yes, obviously 💕</button>
+          </div>
+          <div class="no-area" id="no-area">
+            <button class="btn btn-no" id="noBtn" type="button">No</button>
+          </div>
+
+          <p class="taunt" id="taunt"></p>
+        </div>
+      </section>
+
+      <!-- ── YES SCREEN ── -->
+      <section class="screen hidden" id="screen-yes">
+        <div class="card yes-screen">
+          <div class="yes-emoji" aria-hidden="true">🥰</div>
+          <h2>I knew you'd say yes.</h2>
+
+          <div class="plan-tag" id="plan"></div>
+
+          <div class="letter-text" id="letter" aria-live="polite"></div>
+
+          <div class="actions-row">
+            <button class="chip" id="skipBtn" type="button">Skip typing</button>
+            <a class="chip" href="./" id="replayBtn">Replay ↻</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scattered polaroids around the viewport -->
+      <div class="floating-polaroids hidden" id="floating-polaroids">
+        <div class="floating-polaroid fp-1" id="fp-1">
+          <img class="fp-photo" src="" alt="" />
+          <div class="fp-caption"></div>
+        </div>
+        <div class="floating-polaroid fp-2" id="fp-2">
+          <img class="fp-photo" src="" alt="" />
+          <div class="fp-caption"></div>
+        </div>
+        <div class="floating-polaroid fp-3" id="fp-3">
+          <img class="fp-photo" src="" alt="" />
+          <div class="fp-caption"></div>
+        </div>
+        <div class="floating-polaroid fp-4" id="fp-4">
+          <img class="fp-photo" src="" alt="" />
+          <div class="fp-caption"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Music player (appears after Yes) -->
+    <div class="music-container hidden" id="music-container">
+      <div class="yt-wrapper" id="yt-wrapper">
+        <!-- YouTube iframe injected by JS -->
+      </div>
+      <button class="music-toggle" id="music-toggle" type="button" title="Toggle music">♫</button>
+    </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+    (() => {
+      /* ═══════════════════════════════════════
+         ✏️  EDIT THESE TO PERSONALISE
+         ═══════════════════════════════════════ */
+      const CONFIG = {
+        HER_NAME:    "mi love",
+        YOUR_NAME:   "your baby",
+        DINNER_PLAN: "Dinner reservation + something sweet after 🍷",
+
+        // SoundCloud track URL — paste the full URL from the SoundCloud page
+        // Taylor Swift - Daylight
+        SOUNDCLOUD_URL: "https://soundcloud.com/say-i-do-190923699/daylight-by-taylor-swift",
+
+        // Photos for the polaroid slideshow (src + caption)
+        // Only JPG files included — HEIC won't work in Chrome/Firefox
+        PHOTOS: [
+          // 1. new year
+          { src: "photos/newyear.jpg",     caption: "our first new year together!" },
+          // 2. overseas + scotland
+          { src: "photos/overseas.jpg",    caption: "our first overseas trip!" },
+          { src: "photos/scotland1.JPG",   caption: "the sky!" },
+          { src: "photos/scotland2.JPG",   caption: "sooo pretty" },
+          { src: "photos/scotland3.jpg",   caption: "road tripppp" },
+          // 3. food + matcha
+          { src: "photos/food.jpg",        caption: "love discovering good food" },
+          { src: "photos/food2.jpg",       caption: "you intro'd me to lacherrrrr" },
+          { src: "photos/food3.jpg",       caption: "good food best company" },
+          { src: "photos/foood.jpg",       caption: "love that you hunt tiramisu for me" },
+          { src: "photos/matcha.JPG",      caption: "might love matcha more than me im sed" },
+          // 4. baker
+          { src: "photos/baker.jpg",       caption: "sooo talented" },
+          // 5. habit
+          { src: "photos/habit1.jpg",      caption: "my new habit" },
+          { src: "photos/habit2.jpg",      caption: "thanks to you" },
+          // 6. photobooth
+          { src: "photos/photobooth.JPG",  caption: "photobooths!" },
+          { src: "photos/photobooth2.JPG", caption: "would take so many more with you" },
+          // 7. hospital
+          { src: "photos/hospital.jpg",    caption: "hospitalised same year (dont have yours *cries)" },
+          // 8. looks
+          { src: "photos/looks.JPG",       caption: "how i look at you" },
+          // 9. car
+          { src: "photos/car.jpg",         caption: "your first car! i was there!" },
+          // 10. skies
+          { src: "photos/skies.jpg",       caption: "pretty skies" },
+          // 11. baby
+          { src: "photos/awayfromme.JPG",  caption: "you gon miss me when u go back to DJ" },
+          { src: "photos/baby.JPG",        caption: "you look happyyy" },
+          { src: "photos/baby1.JPG",       caption: "oh hello there nom nom" },
+          { src: "photos/baby2.JPG",       caption: "aiyooo so cute" },
+          { src: "photos/baby3.JPG",       caption: "wow wow attitude" },
+          { src: "photos/baby4.JPG",       caption: "sooo cute (the dog ofc)" },
+          { src: "photos/baby5.JPG",       caption: "nom nom nom" },
+          { src: "photos/babyy.JPG",       caption: "sooo gorgeous honestly" },
+          // 12. ginger
+          { src: "photos/ginger.JPG",      caption: "ginger finally likes me i think" },
+          // 13. sticker
+          { src: "photos/sticker.jpg",     caption: "i love your stickers" },
+          { src: "photos/sticker2.jpg",    caption: "especially cuz theyre just so you" },
+        ],
+
+        SLIDE_INTERVAL: 4000, // ms between slides
+
+        LETTER: `Hey {HER_NAME}…
+
+I just wanted to say — I really, genuinely love doing life with you.
+
+The way you laugh, i just want you to laugh like that all the time. The way you care, it's insane (in a good way). The way everything just feels right when I'm around you.
+
+I don't need a holiday to tell you that. But I'll take any excuse to remind you. I love you so much baby.
+
+Happy Valentine's Day, my gorgeous love.
+
+Yours,
+{YOUR_NAME}`,
+      };
+
+      /* ═══════════════════════════════════════ */
+
+      const $ = id => document.getElementById(id);
+
+      const el = {
+        viewportShell:   $("viewport-shell"),
+        petals:          $("petals"),
+        question:        $("screen-question"),
+        yesScreen:       $("screen-yes"),
+        yesBtn:          $("yesBtn"),
+        noBtn:           $("noBtn"),
+        noArea:          $("no-area"),
+        taunt:           $("taunt"),
+        plan:            $("plan"),
+        letter:          $("letter"),
+        skipBtn:         $("skipBtn"),
+        replayBtn:       $("replayBtn"),
+        floatingPolaroids: $("floating-polaroids"),
+        fp: [1,2,3,4].map(i => ({
+          el:      $(`fp-${i}`),
+          photo:   $(`fp-${i}`)?.querySelector(".fp-photo"),
+          caption: $(`fp-${i}`)?.querySelector(".fp-caption"),
+        })),
+        musicContainer:  $("music-container"),
+        musicToggle:     $("music-toggle"),
+        ytWrapper:       $("yt-wrapper"),
+      };
+
+      const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+      /* ── Personalise text ── */
+      function fill(str) {
+        return str.replace(/\{HER_NAME\}/g, CONFIG.HER_NAME).replace(/\{YOUR_NAME\}/g, CONFIG.YOUR_NAME);
+      }
+
+      /* ── Random helpers ── */
+      function rand(a, b) { return a + Math.random() * (b - a); }
+      function rectsOverlap(a, b) {
+        return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+      }
+      function getAxisRange(total, size, pad) {
+        const min = pad;
+        const max = total - size - pad;
+        if (max >= min) return { min, max };
+        const centered = Math.max((total - size) / 2, 0);
+        return { min: centered, max: centered };
+      }
+      function getPointerPoint(e) {
+        if (!e) return null;
+        if (typeof e.clientX === "number" && typeof e.clientY === "number") {
+          return { x: e.clientX, y: e.clientY };
+        }
+        const touch = e.touches?.[0] || e.changedTouches?.[0];
+        if (!touch) return null;
+        return { x: touch.clientX, y: touch.clientY };
+      }
+      function distance(a, b) {
+        if (!a || !b) return Infinity;
+        return Math.hypot(a.x - b.x, a.y - b.y);
+      }
+      const DODGE_DISTANCE = 80;
+      function pickEscapedPosition(pointer) {
+        const shellRect = el.viewportShell.getBoundingClientRect();
+        const noW = el.noBtn.offsetWidth || 100;
+        const noH = el.noBtn.offsetHeight || 40;
+        const pad = 12;
+        const xRange = getAxisRange(shellRect.width, noW, pad);
+        const yRange = getAxisRange(shellRect.height, noH, pad);
+        const yesRect = el.yesBtn.getBoundingClientRect();
+        const pointerLocal = pointer
+          ? { x: pointer.x - shellRect.left, y: pointer.y - shellRect.top }
+          : null;
+        const avoidZone = {
+          left: yesRect.left - shellRect.left - 24,
+          top: yesRect.top - shellRect.top - 16,
+          right: yesRect.right - shellRect.left + 24,
+          bottom: yesRect.bottom - shellRect.top + 16,
+        };
+        const minCenterX = xRange.min + noW / 2;
+        const maxCenterX = xRange.max + noW / 2;
+        const minCenterY = yRange.min + noH / 2;
+        const maxCenterY = yRange.max + noH / 2;
+
+        function candidateFromAngle(angle, avoidYesZone) {
+          if (!pointerLocal) return null;
+          const centerX = pointerLocal.x + Math.cos(angle) * DODGE_DISTANCE;
+          const centerY = pointerLocal.y + Math.sin(angle) * DODGE_DISTANCE;
+          if (
+            centerX < minCenterX || centerX > maxCenterX ||
+            centerY < minCenterY || centerY > maxCenterY
+          ) return null;
+
+          const candidate = {
+            x: centerX - noW / 2,
+            y: centerY - noH / 2,
+          };
+
+          if (!avoidYesZone) return candidate;
+
+          const candidateRect = {
+            left: candidate.x,
+            top: candidate.y,
+            right: candidate.x + noW,
+            bottom: candidate.y + noH,
+          };
+          if (rectsOverlap(candidateRect, avoidZone)) return null;
+          return candidate;
+        }
+
+        if (pointerLocal) {
+          for (let i = 0; i < 72; i++) {
+            const candidate = candidateFromAngle(rand(0, Math.PI * 2), true);
+            if (candidate) return candidate;
+          }
+
+          const start = rand(0, Math.PI * 2);
+          const steps = 96;
+          const validAngles = [];
+          for (let i = 0; i < steps; i++) {
+            const angle = start + (i / steps) * Math.PI * 2;
+            if (candidateFromAngle(angle, true)) validAngles.push(angle);
+          }
+          if (validAngles.length) {
+            const angle = validAngles[Math.floor(rand(0, validAngles.length))];
+            const candidate = candidateFromAngle(angle, true);
+            if (candidate) return candidate;
+          }
+
+          // Keep the 80px cursor distance even if Yes-zone avoidance is impossible.
+          for (let i = 0; i < 72; i++) {
+            const candidate = candidateFromAngle(rand(0, Math.PI * 2), false);
+            if (candidate) return candidate;
+          }
+        }
+
+        return {
+          x: rand(xRange.min, xRange.max),
+          y: rand(yRange.min, yRange.max),
+        };
+      }
+
+      /* ── Floating petals ── */
+      function spawnPetals() {
+        if (prefersReduced) return;
+        for (let i = 0; i < 14; i++) {
+          const p = document.createElement("div");
+          p.className = "petal";
+          p.style.left = `${rand(0, 100)}%`;
+          p.style.top = `${rand(-10, -5)}%`;
+          p.style.width = p.style.height = `${rand(8, 16)}px`;
+          p.style.opacity = String(rand(0.15, 0.5));
+          p.style.background = `hsl(${rand(340, 360)}, ${rand(60, 85)}%, ${rand(72, 85)}%)`;
+          p.style.animationDuration = `${rand(10, 18)}s`;
+          p.style.animationDelay = `${rand(0, 8)}s`;
+          p.style.setProperty("--dx", `${rand(-60, 60)}px`);
+          p.style.setProperty("--rot", `${rand(180, 540)}deg`);
+          el.petals.appendChild(p);
+        }
+      }
+
+      /* ── No-button messages ── */
+      const noMessages = [
+        "Hm… are you sure baby?",
+        "hmm i think you clicked wrong.",
+        "That button doesn't actually work, so you should stop trying..",
+        "are you really really sure babe?",
+        "The button respectfully declines your click.",
+        "are you really really really sure babe?",
+        "are you reallyyyyyyyyy sure babyyy?",
+        "OK babe just click YES...",
+      ];
+
+      let noCount = 0;
+      let yesScale = 1;
+      let noEscaped = false;
+      let lastEscapedDodgeAt = 0;
+      let lastPointer = null;
+      let queuedEscapedPos = null;
+      let queuedForPointer = null;
+
+      /* ── Move the No button away ── */
+      function dodgeNo(pointer = null) {
+        if (prefersReduced) return;
+        const activePointer = pointer || lastPointer;
+
+        // After first dodge, escape to the viewport shell
+        if (!noEscaped && noCount >= 1) {
+          noEscaped = true;
+          el.viewportShell.appendChild(el.noBtn);
+          el.noBtn.classList.add("escaped");
+          queuedEscapedPos = null;
+          queuedForPointer = null;
+        }
+
+        if (noEscaped) {
+          let pos = null;
+          if (queuedEscapedPos && activePointer && distance(activePointer, queuedForPointer) < 24) {
+            pos = queuedEscapedPos;
+          }
+          if (!pos) pos = pickEscapedPosition(activePointer);
+          el.noBtn.style.left = `${pos.x}px`;
+          el.noBtn.style.top = `${pos.y}px`;
+          el.noBtn.style.transform = "none";
+
+          if (activePointer) {
+            let nextPos = pickEscapedPosition(activePointer);
+            if (distance(nextPos, pos) < 4) nextPos = pickEscapedPosition(activePointer);
+            queuedEscapedPos = nextPos;
+            queuedForPointer = { x: activePointer.x, y: activePointer.y };
+          } else {
+            queuedEscapedPos = null;
+            queuedForPointer = null;
+          }
+        } else {
+          // Initial dodge within the no-area
+          const area = el.noArea.getBoundingClientRect();
+          const noW = el.noBtn.offsetWidth || 100;
+          const noH = el.noBtn.offsetHeight || 40;
+          const pad = 6;
+          const xRange = getAxisRange(area.width, noW, pad);
+          const yRange = getAxisRange(area.height, noH, pad);
+          const newX = rand(xRange.min, xRange.max);
+          const newY = rand(yRange.min, yRange.max);
+          el.noBtn.style.left = `${newX}px`;
+          el.noBtn.style.top  = `${newY}px`;
+          el.noBtn.style.transform = "none";
+        }
+      }
+
+      function onNoAttempt(e) {
+        e?.preventDefault();
+        noCount++;
+        const pointer = getPointerPoint(e);
+        if (pointer) lastPointer = pointer;
+
+        // Show taunt
+        const msg = noMessages[Math.min(noCount - 1, noMessages.length - 1)];
+        el.taunt.textContent = msg;
+        el.taunt.classList.add("visible");
+
+        // Grow the Yes button
+        yesScale = Math.min(yesScale + 0.12, 1.8);
+        el.yesBtn.style.transform = `scale(${yesScale})`;
+        el.yesBtn.style.boxShadow = `0 ${8 + noCount * 3}px ${28 + noCount * 5}px rgba(214, 51, 108, ${0.3 + noCount * 0.03})`;
+
+        // Make No button smaller over time
+        el.noBtn.style.fontSize = `${Math.max(14 - noCount * 0.5, 9)}px`;
+        el.noBtn.style.padding = `${Math.max(12 - noCount, 6)}px ${Math.max(32 - noCount * 2, 14)}px`;
+        el.noBtn.style.opacity = String(Math.max(1 - noCount * 0.06, 0.35));
+
+        // Change No text over time
+        if (noCount >= 4) el.noBtn.textContent = "Fine, no…";
+        if (noCount >= 6) el.noBtn.textContent = "Okay fine…";
+        if (noCount >= 8) el.noBtn.textContent = "…";
+
+        // Dodge after style/text changes so the final size is kept in-bounds
+        dodgeNo(pointer);
+      }
+
+      /* ── Confetti ── */
+      function burstConfetti() {
+        if (typeof window.confetti !== "function") return;
+        const end = Date.now() + 1200;
+        (function frame() {
+          window.confetti({
+            particleCount: 4,
+            startVelocity: 30,
+            spread: 80,
+            origin: { x: rand(0.2, 0.8), y: rand(0.3, 0.6) },
+            colors: ["#d6336c", "#f06595", "#fcc2d7", "#fff0f6", "#fff"],
+          });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        })();
+      }
+
+      /* ── Typing Effect ── */
+      let typingTimer = null;
+      let isTyping = false;
+      const caret = document.createElement("span");
+      caret.className = "caret";
+      caret.setAttribute("aria-hidden", "true");
+
+      function stopTyping() {
+        clearTimeout(typingTimer);
+        typingTimer = null;
+        isTyping = false;
+      }
+
+      function finishTyping(text) {
+        stopTyping();
+        caret.remove();
+        el.letter.textContent = text;
+        el.skipBtn.textContent = "♡";
+        el.skipBtn.disabled = true;
+      }
+
+      function typeLetter() {
+        stopTyping();
+        isTyping = true;
+        el.letter.textContent = "";
+        el.letter.appendChild(caret);
+
+        const text = fill(CONFIG.LETTER || "").trim();
+        let i = 0;
+
+        function tick() {
+          if (!isTyping) return;
+          const ch = text[i++];
+          caret.remove();
+          el.letter.textContent += ch ?? "";
+          el.letter.appendChild(caret);
+
+          if (i >= text.length) { finishTyping(text); return; }
+
+          const delay = ch === "\n" ? rand(200, 360) : rand(20, 45);
+          typingTimer = setTimeout(tick, delay);
+        }
+
+        if (!text.length) { finishTyping(""); return; }
+        typingTimer = setTimeout(tick, 400);
+      }
+
+      /* ── Scattered Polaroid Slideshow ── */
+      let slideTimer = null;
+      let slideIndex = 0;
+      const polaroidRotations = [-5, 4, -3, 6, -4, 3, -6, 5];
+
+      function setupSlideshow() {
+        const photos = CONFIG.PHOTOS || [];
+        if (!photos.length) return;
+
+        el.floatingPolaroids.classList.remove("hidden");
+
+        // Assign initial photos to each of the 4 polaroids (staggered)
+        el.fp.forEach((fp, i) => {
+          const idx = i % photos.length;
+          fp.photo.src = photos[idx].src;
+          fp.caption.textContent = photos[idx].caption || "";
+          fp.el.style.transform = `rotate(${polaroidRotations[i % polaroidRotations.length]}deg)`;
+          // Stagger the fade-in
+          setTimeout(() => fp.el.classList.add("visible"), 300 + i * 400);
+        });
+
+        slideIndex = 4 % photos.length;
+
+        // Cycle: every interval, swap one polaroid's photo (round-robin)
+        let fpTurn = 0;
+        slideTimer = setInterval(() => {
+          const fp = el.fp[fpTurn % 4];
+          const photo = photos[slideIndex % photos.length];
+
+          // Fade out
+          fp.photo.style.opacity = "0";
+          setTimeout(() => {
+            fp.photo.src = photo.src;
+            fp.caption.textContent = photo.caption || "";
+            fp.el.style.transform = `rotate(${polaroidRotations[slideIndex % polaroidRotations.length]}deg)`;
+            fp.photo.style.opacity = "1";
+          }, 400);
+
+          slideIndex = (slideIndex + 1) % photos.length;
+          fpTurn++;
+        }, CONFIG.SLIDE_INTERVAL || 4000);
+      }
+
+      /* ── Music (SoundCloud) ── */
+      let ytVisible = false;
+
+      function startMusic() {
+        const trackUrl = (CONFIG.SOUNDCLOUD_URL || "").trim();
+        if (!trackUrl) return;
+
+        el.musicContainer.classList.remove("hidden");
+
+        // Create SoundCloud embed iframe
+        const iframe = document.createElement("iframe");
+        const encoded = encodeURIComponent(trackUrl);
+        iframe.src = `https://w.soundcloud.com/player/?url=${encoded}&color=%23d6336c&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`;
+        iframe.allow = "autoplay";
+        iframe.scrolling = "no";
+        iframe.setAttribute("frameborder", "no");
+        el.ytWrapper.appendChild(iframe);
+
+        // Show the player briefly then auto-hide
+        ytVisible = true;
+        el.ytWrapper.classList.add("visible");
+        setTimeout(() => {
+          ytVisible = false;
+          el.ytWrapper.classList.remove("visible");
+        }, 3000);
+      }
+
+      // Toggle music player visibility
+      function toggleMusicPlayer() {
+        ytVisible = !ytVisible;
+        el.ytWrapper.classList.toggle("visible", ytVisible);
+      }
+
+      el.musicToggle.addEventListener("click", toggleMusicPlayer);
+
+      /* ── Switch Screens ── */
+      function showYesScreen() {
+        // Hide escaped No button
+        el.noBtn.style.display = "none";
+
+        el.question.classList.add("hidden");
+        el.yesScreen.classList.remove("hidden");
+
+        const planText = (CONFIG.DINNER_PLAN || "").trim();
+        el.plan.textContent = planText || "";
+        if (!planText) el.plan.style.display = "none";
+
+        setupSlideshow();
+        typeLetter();
+      }
+
+      /* ── Yes Click ── */
+      el.yesBtn.addEventListener("click", () => {
+        burstConfetti();
+        startMusic();
+        setTimeout(showYesScreen, 700);
+      });
+
+      /* ── No interactions ── */
+      el.noBtn.addEventListener("pointerenter", onNoAttempt);
+      el.noBtn.addEventListener("pointerdown", onNoAttempt);
+      el.noBtn.addEventListener("touchstart", onNoAttempt, { passive: false });
+      el.noBtn.addEventListener("focus", onNoAttempt);
+
+      /* Dodge when cursor gets close to the escaped button */
+      document.addEventListener("pointermove", (e) => {
+        if (prefersReduced || noCount === 0 || !noEscaped) return;
+        lastPointer = { x: e.clientX, y: e.clientY };
+        const btnRect = el.noBtn.getBoundingClientRect();
+        const dx = Math.max(btnRect.left - e.clientX, 0, e.clientX - btnRect.right);
+        const dy = Math.max(btnRect.top - e.clientY, 0, e.clientY - btnRect.bottom);
+        if (Math.hypot(dx, dy) < 60) {
+          const now = performance.now();
+          if (now - lastEscapedDodgeAt < 130) return;
+          lastEscapedDodgeAt = now;
+          dodgeNo({ x: e.clientX, y: e.clientY });
+        }
+      });
+
+      /* Also keep no-area proximity dodge for before escape */
+      el.noArea.addEventListener("pointermove", (e) => {
+        if (prefersReduced || noCount === 0 || noEscaped) return;
+        lastPointer = { x: e.clientX, y: e.clientY };
+        const btnRect = el.noBtn.getBoundingClientRect();
+        const dx = Math.max(btnRect.left - e.clientX, 0, e.clientX - btnRect.right);
+        const dy = Math.max(btnRect.top - e.clientY, 0, e.clientY - btnRect.bottom);
+        if (Math.hypot(dx, dy) < 40) dodgeNo({ x: e.clientX, y: e.clientY });
+      });
+
+      /* Keep No button in bounds on resize */
+      window.addEventListener("resize", () => {
+        queuedEscapedPos = null;
+        queuedForPointer = null;
+        if (noCount > 0) dodgeNo();
+      });
+
+      /* ── Skip Typing ── */
+      el.skipBtn.addEventListener("click", () => {
+        finishTyping(fill(CONFIG.LETTER || "").trim());
+      });
+
+      /* ── Init ── */
+      spawnPetals();
+
+    })();
+    </script>
+  </body>
+</html>
