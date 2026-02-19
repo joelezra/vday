@@ -619,6 +619,7 @@
     </div>
     </div>
 
+    <script src="https://w.soundcloud.com/player/api.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
     (() => {
@@ -1044,19 +1045,37 @@ Yours,
         slideIndex = 4 % photos.length;
 
         // Cycle: every interval, swap one polaroid's photo (round-robin)
+        // Preload next image before swapping to avoid flash on slow connections
         let fpTurn = 0;
         slideTimer = setInterval(() => {
           const fp = el.fp[fpTurn % 4];
           const photo = photos[slideIndex % photos.length];
+          const rot = polaroidRotations[slideIndex % polaroidRotations.length];
 
-          // Fade out
-          fp.photo.style.opacity = "0";
-          setTimeout(() => {
-            fp.photo.src = photo.src;
-            fp.caption.textContent = photo.caption || "";
-            fp.el.style.transform = `rotate(${polaroidRotations[slideIndex % polaroidRotations.length]}deg)`;
-            fp.photo.style.opacity = "1";
-          }, 400);
+          // Preload the next image
+          const preload = new Image();
+          preload.src = photo.src;
+
+          const doSwap = () => {
+            // Fade out
+            fp.photo.style.opacity = "0";
+            setTimeout(() => {
+              fp.photo.src = photo.src;
+              fp.caption.textContent = photo.caption || "";
+              fp.el.style.transform = `rotate(${rot}deg)`;
+              fp.photo.style.opacity = "1";
+            }, 400);
+          };
+
+          // Swap once preloaded, or after 2s timeout (whichever first)
+          let swapped = false;
+          const swapOnce = () => { if (!swapped) { swapped = true; doSwap(); } };
+          if (preload.complete) {
+            swapOnce();
+          } else {
+            preload.onload = swapOnce;
+            setTimeout(swapOnce, 2000);
+          }
 
           slideIndex = (slideIndex + 1) % photos.length;
           fpTurn++;
@@ -1083,18 +1102,13 @@ Yours,
         iframe.setAttribute("frameborder", "no");
         el.ytWrapper.appendChild(iframe);
 
-        // Load SC Widget API and force play
-        const script = document.createElement("script");
-        script.src = "https://w.soundcloud.com/player/api.js";
-        script.onload = () => {
-          if (window.SC && window.SC.Widget) {
-            scWidget = window.SC.Widget(iframe);
-            scWidget.bind(window.SC.Widget.Events.READY, () => {
-              scWidget.play();
-            });
-          }
-        };
-        document.head.appendChild(script);
+        // Widget API is pre-loaded — bind and play synchronously within user gesture
+        if (window.SC && window.SC.Widget) {
+          scWidget = window.SC.Widget(iframe);
+          scWidget.bind(window.SC.Widget.Events.READY, () => {
+            scWidget.play();
+          });
+        }
 
         // Show the player briefly then auto-hide
         ytVisible = true;
